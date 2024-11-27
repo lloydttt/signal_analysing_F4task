@@ -43,10 +43,24 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define SINE_SAMPLE_COUNT 1000 // 正弦波采样点�????????????????????????????
-#define SINE_AMPLITUDE     2048 // 正弦波幅�???????????????????????????? (12位分辨率: 0-4095)
-#define SINE_OFFSET        2047 // 信号偏移�???????????????????????????? (为了输出正�??)
+#define SINE_SAMPLE_COUNT 1000 // 正弦波采样点�???????????????????????????????
+#define SINE_AMPLITUDE     2047 // 正弦波幅�??????????????????????????????? (12位分辨率: 0-4095)
+#define SINE_OFFSET        2047 // 信号偏移�??????????????????????????????? (为了输出正�??)
 //#define PI                 3.14159265358979323846
+#define LED0_ON() HAL_GPIO_WritePin(GPIOF, GPIO_PIN_9, GPIO_PIN_RESET)
+#define LED0_Reversal()	HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_9)//翻转LED0
+#define LED1_Reversal()	HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_10)//翻转LED1
+#define BEEP__Reversal() HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8)//翻转BEEP
+
+#define KEY0 HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_4)//读取PE4电平
+#define KEY1 HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_3)//读取PE3电平
+#define KEY2 HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_2)//读取PE2电平
+#define WK_UP HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_0)//读取PA0电平
+#define KEY0_Press 1//KEY0被按下标志位
+#define KEY1_Press 2//KEY1被按下标志位
+#define KEY2_Press 3//KEY2被按下标志位
+#define WK_UP_Press 4//WK_UP被按下标志位
+uint16_t signal_type_flag = 0;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -57,7 +71,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint16_t ADC_Value;
+
 uint16_t sin_wave_buffer[SINE_SAMPLE_COUNT];
 uint16_t recv_data[SINE_SAMPLE_COUNT];
 int ad_flag = 0;
@@ -66,13 +80,8 @@ int ad_flag = 0;
 #define OSC_Y_START 40
 #define OSC_WIDTH   240
 #define OSC_HEIGHT  120
-#define SINE_X_START 30       // X ?????
-#define SINE_Y_START 40       // Y ?????
-#define SINE_WIDTH    240     // ??????
-#define SINE_HEIGHT   120     // ??????
 
 
-#define OSC_Y_END (OSC_Y_START + OSC_HEIGHT)  // ???????Y??
 #define FFT_X_START 0
 #define FFT_Y_START 350
 #define FFT_WIDTH 300
@@ -81,6 +90,7 @@ int ad_flag = 0;
 arm_cfft_radix4_instance_f32 scfft;
 float FFT_inArray[FFT_LENGTH*2];
 float FFT_outArray[FFT_LENGTH];
+uint8_t key = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -92,16 +102,48 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 void Generate_SineWave(void) {
-    for (int i = 0; i < SINE_SAMPLE_COUNT; i++) {
-        // 生成正弦�????????????????????????????
-        sin_wave_buffer[i] = (uint16_t)(SINE_AMPLITUDE * sin(85 * PI * i / SINE_SAMPLE_COUNT) + SINE_OFFSET);
+    if(signal_type_flag == 0){
+        for (int i = 0; i < SINE_SAMPLE_COUNT; i++) {
+            // 生成正弦
+            sin_wave_buffer[i] = (uint16_t)(SINE_AMPLITUDE * sin(85 * PI * i / SINE_SAMPLE_COUNT) + SINE_OFFSET);
+        }
+    }else if(signal_type_flag == 1){
+        const int wave_periods = 500; // 方波周期数（频率的�?�数�???
+        for (int i = 0; i < SINE_SAMPLE_COUNT; i++) {
+            // 计算当前点对应的周期位置
+            if (((i * wave_periods) % SINE_SAMPLE_COUNT) < (SINE_SAMPLE_COUNT / (2 * wave_periods))) {
+                // 高电�???
+                sin_wave_buffer[i] = SINE_OFFSET + SINE_AMPLITUDE;
+            } else {
+                // 低电�???
+                sin_wave_buffer[i] = SINE_OFFSET - SINE_AMPLITUDE;
+            }
+        }
     }
 }
+uint8_t KEY_Scan(uint8_t mode)
+{
+    static uint8_t key_up=1;//按键松开标志
+    if(mode)key_up=1; //支持连按
+    if(key_up&&(KEY0==0||KEY1==0||KEY2==0||WK_UP==1))
+    {
+        HAL_Delay(10);//去抖�??
+        key_up=0;
+        if(KEY0==0)return KEY0_Press;
+        else if(KEY1==0)return KEY1_Press;
+        else if(KEY2==0)return KEY2_Press;
+        else if(WK_UP==1)return WK_UP_Press;
+    }else if(KEY0==1&&KEY1==1&&KEY2==1&&WK_UP==0)key_up=1;
+    return 0;//无按键按�??
+}
+
+
+
 void Start_DAC_With_DMA(void) {
 
     Generate_SineWave();
 
-    // 启动 DAC �???????????????????????????? DMA
+    // 启动 DAC �??????????????????????????????? DMA
     HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_1, (uint32_t*)sin_wave_buffer, SINE_SAMPLE_COUNT, DAC_ALIGN_12B_R);
 
     // 启动定时器，作为 DAC 的触发源
@@ -113,14 +155,14 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)    //ADC转换完成回�
 }
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    // �????????????????????????????查是哪个定时器触发的回调
+    // �???????????????????????????????查是哪个定时器触发的回调
 //    if (htim->Instance == htim6.Instance) // TIM3 溢出事件
 //    {
 //        printf("TIM6 triggered\r\n");
 //    }
     if (htim->Instance == htim3.Instance) // TIM43溢出事件
     {
-//        HAL_ADC_Start_IT(&hadc1); //定时器中断里面开启ADC中断转换�?????????????????1ms�?????????????????启一次采�?????????????????
+//        HAL_ADC_Start_IT(&hadc1); //定时器中断里面开启ADC中断转换�????????????????????1ms�????????????????????启一次采�????????????????????
 //        printf("TIM3 triggered\r\n");
 //        printf("%d\r\n", ad_flag);
 
@@ -138,39 +180,7 @@ void testpoint(uint16_t adcv){
     a++;
 }
 //
-void DrawOscilloscopeWindow(void) {
-    // ????
-    LCD_DrawRectangle(OSC_X_START, OSC_Y_START, OSC_X_START + OSC_WIDTH, OSC_Y_START + OSC_HEIGHT);
 
-    // ?????????
-    LCD_DrawLine(OSC_X_START, OSC_Y_START + OSC_HEIGHT / 2, OSC_X_START + OSC_WIDTH, OSC_Y_START + OSC_HEIGHT / 2); // ????
-    LCD_DrawLine(OSC_X_START + OSC_WIDTH / 2, OSC_Y_START, OSC_X_START + OSC_WIDTH / 2, OSC_Y_START + OSC_HEIGHT); // ????
-}
-void data_drawing(){
-
-}
-int Map_ADC_To_Screen(uint16_t adc_value) {
-    if (adc_value > 4095) adc_value = 4095; // 防止溢出
-    return OSC_Y_START + OSC_HEIGHT - (adc_value * OSC_HEIGHT / 4096);
-}
-
-void DrawWaveform(void) {
-    int prev_x = OSC_X_START;       // ????? X ??
-    int prev_y = Map_ADC_To_Screen(recv_data[0]); // ????? Y ??
-
-    for (int i = 1; i < SINE_SAMPLE_COUNT; i++) {
-        // ????????
-        int curr_x = OSC_X_START + (i * OSC_WIDTH) / SINE_SAMPLE_COUNT; // ???? X ??
-        int curr_y = Map_ADC_To_Screen(recv_data[i]);               // ???? Y ??
-
-        // ??
-        LCD_DrawLine(prev_x, prev_y, curr_x, curr_y);
-
-        // ?????????
-        prev_x = curr_x;
-        prev_y = curr_y;
-    }
-}
 void AdcDataDrawing()
 {
     uint16_t x1, y1, x2, y2;
@@ -179,7 +189,7 @@ void AdcDataDrawing()
     float x_scale = (float)(320 + 10) / SINE_SAMPLE_COUNT;
     float y_scale = (float)(480 / 2.5) / 4095;
 
-    // 初始点坐�????
+    // 初始点坐�???????
     x1 = 0;
     y1 = 0;
 
@@ -304,6 +314,7 @@ int main(void)
             ad_flag = 0;
             recv_data[i] = HAL_ADC_GetValue(&hadc1);
             printf("%hu\n",recv_data[i]);
+//            printf("%d\n\n\n\n\n\n\n\n",signal_type_flag);
 //            LCD_DrawPoint((i*320)/1000,240*recv_data[i]/4096);
 //            testpoint(recv_data[i]);
         }
@@ -313,8 +324,7 @@ int main(void)
           FFT_inArray[2 * i] = (float)recv_data[i];
           FFT_inArray[2 * i + 1] = 0.0f; // Imaginary part
       }
-//
-////      // Perform FFT
+
       arm_cfft_radix4_f32(&scfft, FFT_inArray);
       arm_cmplx_mag_f32(FFT_inArray, FFT_outArray, FFT_LENGTH);
 
@@ -325,7 +335,7 @@ int main(void)
           if (FFT_outArray[i] > 500.0f)
               FFT_outArray[i] = 500.0f;
       }
-//      LCD_Fill(OSC_X_START, OSC_Y_START, OSC_X_START + OSC_WIDTH, OSC_Y_START + OSC_HEIGHT, WHITE);
+
       LCD_Clear(WHITE);
       axis_drawing();
 
@@ -333,7 +343,16 @@ int main(void)
 
 
       DrawFFT();
-      HAL_Delay(10);
+
+      key = KEY_Scan(0);
+      if(key == KEY0_Press){
+          signal_type_flag = 1;
+      } else if (key == KEY1_Press){
+          signal_type_flag = 0;
+      }
+//      printf("%d\n\n\n\n\n\n\n\n",signal_type_flag);
+      HAL_Delay(50);
+      Generate_SineWave();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

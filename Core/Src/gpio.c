@@ -45,17 +45,29 @@ void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOF_CLK_ENABLE();
-  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LCD_BACK_GPIO_Port, LCD_BACK_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pins : PE2 PE3 PEPin */
+  GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3|Key0_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PA0 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = LCD_BACK_Pin;
@@ -67,5 +79,23 @@ void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 2 */
+//void KEY_Init(void)
+//{
+//    GPIO_InitTypeDef GPIO_InitStructure;
+//
+////    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOE,
+////                           ENABLE);//使能 GPIOA,GPIOE 时钟
+//    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4;
+//    //KEY0 KEY1 KEY2 对应引脚
+//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;//普通输入模式
+//    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;//100M
+//    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
+//    GPIO_Init(GPIOE, &GPIO_InitStructure);//初始化 GPIOE2,3,4
+//
+//    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;//WK_UP 对应引脚 PA0
+//    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN ;//下拉
+//    GPIO_Init(GPIOA, &GPIO_InitStructure);//初始化 GPIOA0
+//
+//}
 
 /* USER CODE END 2 */

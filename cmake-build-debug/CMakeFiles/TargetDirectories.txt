@@ -1,0 +1,3 @@
+D:/study/QEA2/Part2/Project/A_task/A_task/cmake-build-debug/CMakeFiles/A_task.elf.dir
+D:/study/QEA2/Part2/Project/A_task/A_task/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/study/QEA2/Part2/Project/A_task/A_task/cmake-build-debug/CMakeFiles/rebuild_cache.dir

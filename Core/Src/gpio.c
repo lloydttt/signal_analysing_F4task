@@ -84,17 +84,17 @@ void MX_GPIO_Init(void)
 //    GPIO_InitTypeDef GPIO_InitStructure;
 //
 ////    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOE,
-////                           ENABLE);//Ê¹ÄÜ GPIOA,GPIOE Ê±ÖÓ
+////                           ENABLE);//Ê¹ï¿½ï¿½ GPIOA,GPIOE Ê±ï¿½ï¿½
 //    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4;
-//    //KEY0 KEY1 KEY2 ¶ÔÓ¦Òý½Å
-//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;//ÆÕÍ¨ÊäÈëÄ£Ê½
+//    //KEY0 KEY1 KEY2 ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½
+//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;//ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½Ä£Ê½
 //    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;//100M
-//    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//ÉÏÀ­
-//    GPIO_Init(GPIOE, &GPIO_InitStructure);//³õÊ¼»¯ GPIOE2,3,4
+//    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//ï¿½ï¿½ï¿½ï¿½
+//    GPIO_Init(GPIOE, &GPIO_InitStructure);//ï¿½ï¿½Ê¼ï¿½ï¿½ GPIOE2,3,4
 //
-//    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;//WK_UP ¶ÔÓ¦Òý½Å PA0
-//    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN ;//ÏÂÀ­
-//    GPIO_Init(GPIOA, &GPIO_InitStructure);//³õÊ¼»¯ GPIOA0
+//    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;//WK_UP ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ PA0
+//    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN ;//ï¿½ï¿½ï¿½ï¿½
+//    GPIO_Init(GPIOA, &GPIO_InitStructure);//ï¿½ï¿½Ê¼ï¿½ï¿½ GPIOA0
 //
 //}
 

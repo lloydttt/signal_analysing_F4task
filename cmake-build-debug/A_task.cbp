@@ -302,6 +302,15 @@
 		<Unit filename="D:/study/QEA2/Part2/Project/A_task/A_task/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h">
 			<Option target="A_task.elf"/>
 		</Unit>
+		<Unit filename="D:/study/QEA2/Part2/Project/A_task/A_task/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_nand.h">
+			<Option target="A_task.elf"/>
+		</Unit>
+		<Unit filename="D:/study/QEA2/Part2/Project/A_task/A_task/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_nor.h">
+			<Option target="A_task.elf"/>
+		</Unit>
+		<Unit filename="D:/study/QEA2/Part2/Project/A_task/A_task/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pccard.h">
+			<Option target="A_task.elf"/>
+		</Unit>
 		<Unit filename="D:/study/QEA2/Part2/Project/A_task/A_task/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h">
 			<Option target="A_task.elf"/>
 		</Unit>
@@ -408,6 +417,15 @@
 			<Option target="A_task.elf"/>
 		</Unit>
 		<Unit filename="D:/study/QEA2/Part2/Project/A_task/A_task/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c">
+			<Option target="A_task.elf"/>
+		</Unit>
+		<Unit filename="D:/study/QEA2/Part2/Project/A_task/A_task/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_nand.c">
+			<Option target="A_task.elf"/>
+		</Unit>
+		<Unit filename="D:/study/QEA2/Part2/Project/A_task/A_task/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_nor.c">
+			<Option target="A_task.elf"/>
+		</Unit>
+		<Unit filename="D:/study/QEA2/Part2/Project/A_task/A_task/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pccard.c">
 			<Option target="A_task.elf"/>
 		</Unit>
 		<Unit filename="D:/study/QEA2/Part2/Project/A_task/A_task/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c">

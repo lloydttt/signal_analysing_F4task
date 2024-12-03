@@ -80,12 +80,12 @@ clean: CMakeFiles/A_task.elf.dir/clean
 CMakeFiles/A_task.elf.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\A_task.elf.dir\build.make CMakeFiles/A_task.elf.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\A_task.elf.dir\build.make CMakeFiles/A_task.elf.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=D:\study\QEA2\Part2\Project\A_task\A_task\cmake-build-debug\CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38 "Built target A_task.elf"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=D:\study\QEA2\Part2\Project\A_task\A_task\cmake-build-debug\CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41 "Built target A_task.elf"
 .PHONY : CMakeFiles/A_task.elf.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/A_task.elf.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start D:\study\QEA2\Part2\Project\A_task\A_task\cmake-build-debug\CMakeFiles 38
+	$(CMAKE_COMMAND) -E cmake_progress_start D:\study\QEA2\Part2\Project\A_task\A_task\cmake-build-debug\CMakeFiles 41
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/A_task.elf.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start D:\study\QEA2\Part2\Project\A_task\A_task\cmake-build-debug\CMakeFiles 0
 .PHONY : CMakeFiles/A_task.elf.dir/rule

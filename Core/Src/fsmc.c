@@ -2695,6 +2695,22 @@ void LCD_ShowxNum(uint16_t x,uint16_t y,uint32_t num,uint8_t len,uint8_t size,ui
         LCD_ShowChar(x+(size/2)*t,y,temp+'0',size,mode&0X01);
     }
 }
+void LCD_ShowFloat(uint16_t x,uint16_t y,uint8_t size,float num,uint8_t Int,uint8_t Float)
+{
+    int i,n,a;
+    double	t;
+    n=num;
+    t=(num-n);
+    for(i=0;i<Float;i++)
+    {
+        a=t*10;
+        t=(t*10)-a;
+        LCD_ShowxNum(x+8+i*8+Int*8,y,a,1,size,0);
+    }
+    LCD_ShowxNum(x,y,n,Int,size,0);
+    LCD_ShowString(x+Int*8,y,Int*16,16,size,".");
+
+}
 
 //��ʾ�ַ���
 //x,y:�������

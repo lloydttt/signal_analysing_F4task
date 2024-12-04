@@ -61,7 +61,7 @@ uint16_t signal_type_flag = 0;
 #define FFT_WIDTH 300
 #define FFT_HEIGHT 120
 #define FFT_LENGTH 1024
-#define Fs 168674
+//#define Fs 168674
 
 /* USER CODE END PD */
 
@@ -86,6 +86,10 @@ float FFT_outArray[FFT_LENGTH];
 uint8_t key = 0;
 uint32_t maxIndex;
 float32_t max_value = 0.0f;
+float32_t base_frequency = 1000;
+float Fs = 168674;
+float omega = 50;
+int flag_dma = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -100,10 +104,10 @@ void Generate_SineWave(void) {
     if(signal_type_flag == 0){
         for (int i = 0; i < SINE_SAMPLE_COUNT; i++) {
             // 生成正弦
-            sin_wave_buffer[i] = (uint16_t)(SINE_AMPLITUDE * sin(50 * PI * i / SINE_SAMPLE_COUNT) + SINE_OFFSET);
+            sin_wave_buffer[i] = (uint16_t)(SINE_AMPLITUDE * sin(omega * PI * i / SINE_SAMPLE_COUNT) + SINE_OFFSET);
         }
     }else if(signal_type_flag == 1){
-        const int wave_periods = 50; // 方波周期数（频率的�?�数�???
+        const int wave_periods = 5; // 方波周期数（频率的�?�数�???
         for (int i = 0; i < SINE_SAMPLE_COUNT; i++) {
             // 计算当前点对应的周期位置
             if (((i * wave_periods) % SINE_SAMPLE_COUNT) < (SINE_SAMPLE_COUNT / (2 * wave_periods))) {
@@ -206,34 +210,44 @@ void DrawFFT(void) {
         // 将浮点坐标转换为整数坐标进行绘制
         LCD_DrawLine((uint16_t) x, FFT_Y_START, (uint16_t) x, (uint16_t) y);
     }
-//    LCD_ShowString();
-//
+//    LCD_ShowString(10,380,20,10,16,"该信号");
 
+    LCD_ShowString(15,380,300,16,16,"frequency of the fundamental wave is");
+
+    LCD_ShowNum(135,410,base_frequency,4,16);
 
 }
 /*----------------------------------------------------------------------------------------*/
 void axis_drawing(){
+    LCD_ShowString(15,10,300,16,16,"*************  WELCOME  *************");
     LCD_DrawLine(0,195,320,195);
-    LCD_ShowNum(20,200,10,4,12);
-    LCD_ShowNum(64,200,20,4,12);
-    LCD_ShowNum(108,200,30,4,12);
-    LCD_ShowNum(152,200,40,4,12);
-    LCD_ShowNum(196,200,50,4,12);
-    LCD_ShowNum(240,200,60,4,12);
-    LCD_ShowNum(280,200,70,4,12);
-    LCD_DrawLine(160,195,160,0);
-    LCD_ShowNum(170,00,90,2,12);
-    LCD_ShowNum(170,20,80,2,12);
-    LCD_ShowNum(170,40,70,2,12);
-    LCD_ShowNum(170,60,60,2,12);
-    LCD_ShowNum(170,80,50,2,12);
-    LCD_ShowNum(170,100,40,2,12);
-    LCD_ShowNum(170,120,30,2,12);
-    LCD_ShowNum(170,140,20,2,12);
-    LCD_ShowNum(170,160,10,2,12);
-    LCD_ShowNum(170,180,0,2,12);
+    LCD_ShowNum(20,200,0,4,12);
+//    LCD_ShowNum(64,200,20,4,12);
+//    LCD_ShowNum(108,200,30,4,12);
+    LCD_ShowNum(152,200,500,4,12);
+//    LCD_ShowNum(196,200,50,4,12);
+//    LCD_ShowNum(240,200,60,4,12);
+    LCD_ShowNum(280,200,1000,4,12);
+    LCD_DrawLine(160,195,160,40);
+    LCD_DrawLine(160,40,155,50);
+    LCD_DrawLine(160,40,165,50);
+    LCD_ShowString(45,240,300,16,16,"-------  Spectrogram  -------");
+//    LCD_ShowNum(170,00,90,2,12);
+//    LCD_ShowNum(170,20,80,2,12);
+//    LCD_ShowNum(170,40,70,2,12);
+//    LCD_ShowNum(170,60,60,2,12);
+    LCD_ShowFloat(170,60,12,3.31,1,2);
+//    LCD_ShowNum(170,80,50,2,12);
+//    LCD_ShowNum(170,100,40,2,12);
+    LCD_ShowFloat(170,100,12,1.66,1,2);
+//    LCD_ShowNum(170,120,30,2,12);
+//    LCD_ShowNum(170,140,20,2,12);
+    LCD_ShowNum(170,140,0,2,12);
+//    LCD_ShowNum(170,180,0,2,12);
+    LCD_ShowString(20,450,300,16,16,"************  QEA LYT  ************");
 
 }
+
 /* USER CODE END 0 */
 
 /**
@@ -289,54 +303,63 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+      LCD_Clear(WHITE);
 
-      AdcDataDrawing();
+//      if(flag_dma == 1){
+          AdcDataDrawing();
 
-      for (int i = 0; i < FFT_LENGTH; i++)
-      {
-//          FFT_inArray[i*2] = (float)recv_data[i];
-//          FFT_inArray[i*2+1] = (float)recv_data[i];
-          FFT_inArray[i] = (float)recv_data[i];
-      }
+          for (int i = 0; i < FFT_LENGTH; i++)
+          {
 
-      /* 执行 FFT 计算 */
-      arm_rfft_fast_f32(&fft_instance, FFT_inArray, FFT_outArray, 0);
+              FFT_inArray[i] = (float)recv_data[i];
+          }
+
+          /* 执行 FFT 计算 */
+          arm_rfft_fast_f32(&fft_instance, FFT_inArray, FFT_outArray, 0);
 //      // Normalize and limit FFT values for display
 
 ///* 计算幅值谱 */
-      FFT_outArray[0] = fabsf(FFT_outArray[0]); // 直流分量，实数
-      for (int i = 1; i < FFT_LENGTH / 2; i++)
-      {
-          float real = FFT_outArray[2 * i];                   // 实部
-          float imag = FFT_outArray[2 * i + 1];               // 虚部
-          FFT_outArray[i] = sqrtf(real * real + imag * imag); // 计算幅值
-      }
+          FFT_outArray[0] = fabsf(FFT_outArray[0]); // 直流分量，实数
+          for (int i = 1; i < FFT_LENGTH / 2; i++)
+          {
+              float real = FFT_outArray[2 * i];                   // 实部
+              float imag = FFT_outArray[2 * i + 1];               // 虚部
+              FFT_outArray[i] = sqrtf(real * real + imag * imag); // 计算幅值
+          }
 
-      arm_max_f32(FFT_outArray+1, SINE_SAMPLE_COUNT-1, &max_value, &maxIndex);
-      printf("Dominant index: %.2lu Hz\n", maxIndex);
-      // 计算对应的频率
-      float32_t frequency = (float32_t)maxIndex * Fs / FFT_LENGTH;
+          arm_max_f32(FFT_outArray+1, SINE_SAMPLE_COUNT-1, &max_value, &maxIndex);
+//      printf("Dominant index: %.2lu Hz\n", maxIndex);
+          // 计算对应的频率
+          base_frequency = (float32_t)maxIndex * Fs / FFT_LENGTH ;
 
-      // 输出结果
-      printf("Dominant frequency: %.2f Hz\n", frequency);
-      DrawFFT();
-
-
-//      axis_drawing();
+          // 输出结果
+//      printf("Dominant base_frequency: %.2f Hz\n", base_frequency);
+          DrawFFT();
 
 
+          axis_drawing();
 
 
-      key = KEY_Scan(0);
-      if(key == KEY0_Press){
-          signal_type_flag = 1;
-      } else if (key == KEY1_Press){
-          signal_type_flag = 0;
-      }
+
+
+          key = KEY_Scan(0);
+          if(key == KEY0_Press){
+              signal_type_flag = 1;
+//          base_frequency -= 100;
+          } else if (key == KEY1_Press){
+              signal_type_flag = 0;
+          }else if(key == KEY2_Press){
+//              sin_wave_signal = 1;
+                omega -= 5;
+          }
+//          flag_dma = 0;
+
+          HAL_ADC_Start_DMA(&hadc1,(uint32_t*)recv_data,SINE_SAMPLE_COUNT);
+//      }
+
 //      printf("%d\n\n\n\n\n\n\n\n",signal_type_flag);
       HAL_Delay(50);
       Generate_SineWave();
-      LCD_Clear(WHITE);
 
     /* USER CODE END WHILE */
 

@@ -187,7 +187,7 @@ void LCD_Scan_Dir(uint8_t dir);
 void LCD_Display_Dir(uint8_t dir);
 //���ô���
 void LCD_Set_Window(uint16_t sx,uint16_t sy,uint16_t width,uint16_t height);
-
+void LCD_ShowFloat(uint16_t x,uint16_t y,uint8_t size,float num,uint8_t Int,uint8_t Float);
 //LCD������������
 #define SSD_HOR_PULSE_WIDTH		1			//ˮƽ����
 #define SSD_HOR_BACK_PORCH		46			//ˮƽǰ��
